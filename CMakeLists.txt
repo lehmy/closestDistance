@@ -30,7 +30,10 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Charts REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
+        closestdistancealgorithm.cpp
         generator.cpp
+        modelviewcontroller.cpp
+        qml.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
