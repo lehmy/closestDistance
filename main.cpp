@@ -2,41 +2,31 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <algorithm>    // std::merge, std::sort
-#include "generator.h"
+#include <generator.h>
 #include "closestdistancealgorithm.h"
 #include "datamodel.h"
 #include "modelviewcontroller.h"
 #include <QQmlContext>
-#include <QtCharts/QScatterSeries>
-#include <QtCharts/QLineSeries>
 
-std::vector<QPointF> getSortedRandomVector(int numberOfPoints)
-{
-    std::vector<QPointF> vector;
-
-    for(int i = 0u; i < numberOfPoints; ++i)
-    {
-        vector.push_back(Generator::generateRandomPair());
-    }
-
-    std::sort(vector.begin(), vector.end(), Generator::comparePoints);
-    return vector;
-
-}
 
 int main(int argc, char *argv[])
 {
     Q_UNUSED(argc);
     Q_UNUSED(argv);
-    std::vector<QPointF> myVector;
 
-
-    myVector = getSortedRandomVector(100);
-    qDebug() << myVector.size();
+    std::vector<QPointF> myVector = Generator::getSortedRandomVector(1000);
+    auto start = std::chrono::system_clock::now();
     auto min = closestDistance::calculateClothestDistance(myVector);
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> duartionBruteForce = end-start;
+
+    start = std::chrono::system_clock::now();
     auto minOptimized = closestDistance::calculateClothestDistanceOptimized(myVector);
-    qDebug() << "Closest Distance : " << min;
-    qDebug() << "Closest Distance : " << minOptimized;
+    end = std::chrono::system_clock::now();
+    std::chrono::duration<double> durationOptimized = end-start;
+
+    qDebug() << "Closest Distance brute force: " << min << " " << "Duration: " << duartionBruteForce.count() << " s";
+    qDebug() << "Closest Distance optimized: " << minOptimized << " " << "Duration: " << durationOptimized.count() << " s";
 
     if(min != minOptimized || (min < 0.0f))
     {

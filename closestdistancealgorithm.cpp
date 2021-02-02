@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <algorithm>    // std::merge, std::sort
 #include <QPoint>
+#include <generator.h>
 
 //**********************************************************************
 // Helper declaration
@@ -13,6 +14,8 @@
 static float calculateClothestDistanceBetween(const QPointF& p1, const std::vector<QPointF> &list);
 
 static float distance(const QPointF& a, const QPointF& b);
+
+static float calculateStripRegion(std::vector<QPointF> vec, float minDistance);
 
 //**********************************************************************
 // Module implementation
@@ -68,7 +71,7 @@ float closestDistance::calculateClothestDistanceOptimized(const std::vector<QPoi
 
     if(vecC.size() >= 2)
     {
-        minDistance = std::min(minDistance,calculateClothestDistance(vecC));
+        minDistance = calculateStripRegion(vecC,minDistance);
     }
 
     return minDistance;
@@ -107,3 +110,19 @@ float calculateClothestDistanceBetween(const QPointF& p1, const std::vector<QPoi
 
     return d;
 }
+
+static float calculateStripRegion(std::vector<QPointF> vec, float minDistance)
+{
+    std::sort(vec.begin(), vec.end(), Generator::comparePointsY);
+
+    for (auto it = vec.begin(); it != vec.end(); ++it)
+    {
+        for(auto it2 = std::next(it,1); it2 != vec.end() && ((*it2).y() - (*it).y() < minDistance) ; ++it2)
+        {
+            minDistance = std::min(minDistance,distance((*it),(*it2)));
+        }
+    }
+
+    return minDistance;
+}
+
